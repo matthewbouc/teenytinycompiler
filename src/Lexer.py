@@ -32,10 +32,14 @@ class Lexer:
             self.nextChar()
 
     def skipComment(self):
-        pass
+        if self.curChar == '#':
+            while self.curChar != '\n':
+                self.nextChar()
 
     def getToken(self):
         self.skipWhitespace()
+        self.skipComment()
+        token = None
 
         match self.curChar:
             case '+':
@@ -50,8 +54,47 @@ class Lexer:
                 token = Token(self.curChar, TokenType.NEWLINE)
             case '\0':
                 token = Token('', TokenType.EOF)
+            case '=':
+                if self.peek() == '=':
+                    lastChar = self.curChar
+                    self.nextChar()
+                    token = Token(lastChar + self.curChar, TokenType.EQEQ)
+                else:
+                    token = Token(self.curChar, TokenType.EQ)
+            case '>':
+                if self.peek() == '=':
+                    lastChar = self.curChar
+                    self.nextChar()
+                    token = Token(lastChar + self.curChar, TokenType.GTEQ)
+                else:
+                    token = Token(self.curChar, TokenType.GT)
+            case '<':
+                if self.peek() == '=':
+                    lastChar = self.curChar
+                    self.nextChar()
+                    token = Token(lastChar + self.curChar, TokenType.LTEQ)
+                else:
+                    token = Token(self.curChar, TokenType.LT)
+            case '!':
+                if self.peek() == '=':
+                    lastChar = self.curChar
+                    self.nextChar()
+                    token = Token(lastChar + self.curChar, TokenType.NOTEQ)
+                else:
+                    self.abort("Expected !=, got !" + self.peek())
+            case '\"':
+                self.nextChar()
+                startPos = self.curPos
+                breakingChars = ['\r', '\n', '\t', '\\', '%']
+                while self.curChar != '\"':
+                    if self.curChar in breakingChars:
+                        self.abort("Illegal character in string.")
+                    self.nextChar()
+                tokenText = self.source[startPos : self.curPos]
+                token = Token(tokenText, TokenType.STRING)
             case _:
                 self.abort("unknown token: " + self.curChar)
 
         self.nextChar()
         return token
+    
