@@ -4,31 +4,13 @@ from TokenType import *
 
 
 def main():
-    # source = "LET foobar = 123"
-    # lexer = Lexer(source)
-    # while lexer.peek() != '\0':
-    #     print(lexer.curChar)
-    #     lexer.nextChar()
 
-    # source = "+- */ >>= = !="
-    # lexer = Lexer(source)
-    # token = lexer.getToken()
-    # while token.kind != TokenType.EOF:
-    #     print(token.kind)
-    #     token = lexer.getToken()
-
-    # source = "+- # This is a comment!\n */"
-    # lexer = Lexer(source)
-    # token = lexer.getToken()
-    # while token.kind != TokenType.EOF:
-    #     print(token.kind)
-    #     token = lexer.getToken()
-
-    source = "+- \"This is a string\" # This is a comment!\n */"
+    source = "IF+-123 foo*THEN/"
     lexer = Lexer(source)
     token = lexer.getToken()
     while token.kind != TokenType.EOF:
         print(token.kind)
         token = lexer.getToken()
+
 
 main()

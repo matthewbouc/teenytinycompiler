@@ -1,4 +1,5 @@
 import sys
+import re
 from Token import *
 from TokenType import *
 
@@ -92,6 +93,32 @@ class Lexer:
                     self.nextChar()
                 tokenText = self.source[startPos : self.curPos]
                 token = Token(tokenText, TokenType.STRING)
+
+            case _ if self.curChar.isdigit():
+                startPos = self.curPos
+                while self.peek().isdigit():
+                    self.nextChar()
+                if self.peek() == '.':
+                    self.nextChar()
+                    if not self.peek().isdigit():
+                        self.abort("Illegal character in number.")
+                    while self.peek().isdigit():
+                        self.nextChar()
+                
+                tokenText = self.source[startPos : self.curPos + 1]
+                token = Token(tokenText, TokenType.NUMBER)
+
+            case _ if self.curChar.isalpha():
+                startPos = self.curPos
+                while self.peek().isalnum():
+                    self.nextChar()
+                tokenText = self.source[startPos : self.curPos + 1]
+                keyword = Token.checkIfKeyword(tokenText)
+                if keyword == None:
+                    token = Token(tokenText, TokenType.IDENT)
+                else:
+                    token = Token(tokenText, keyword)
+
             case _:
                 self.abort("unknown token: " + self.curChar)
 
