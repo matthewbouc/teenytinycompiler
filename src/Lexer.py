@@ -1,5 +1,4 @@
 import sys
-import re
 from Token import *
 from TokenType import *
 
