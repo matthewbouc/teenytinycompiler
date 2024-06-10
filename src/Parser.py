@@ -27,3 +27,58 @@ class Parser:
 
     def abort(self, message):
         sys.exit("Error: " + message)
+
+    def newline(self):
+        print("NEWLINE")
+
+        self.match(TokenType.NEWLINE)
+        while self.checkToken(TokenType.NEWLINE):
+            self.nextToken()
+
+
+#### Production Rules ####
+
+    # program ::= {statement}
+    def program(self):
+        print("PROGRAM")
+
+        # Parse all statements in the program.
+        while not self.checkToken(TokenType.EOF):
+            self.statement()
+
+    # statement ::= ....
+    def statement(self):
+        match self.curToken.kind:
+        # "PRINT" (expression | string) nl
+            case TokenType.PRINT:
+                print("STATEMENT-PRINT")
+                self.nextToken()
+
+                if self.checkToken(TokenType.STRING):
+                    # Simple string
+                    self.nextToken()
+                else:
+                    # Expect an expression
+                    self.expression()
+        # "IF" comparison "THEN" {statement} "ENDIF"
+            case TokenType.IF:
+                print("STATEMENT-IF")
+                self.nextToken()
+                self.comparison() # TODO build this out
+
+                self.match(TokenType.THEN)
+                self.newline()
+
+                # zero or more statements in the body
+                while not self.checkToken(TokenType.ENDIF):
+                    self.statement()
+
+                self.match(TokenType.ENDIF)
+
+
+
+
+            case _:
+                self.abort("Invalid statement at " + self.curToken.text + " (" + self.curToken.kind.name + ")")
+        # end statement
+        self.newline()
