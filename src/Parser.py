@@ -42,6 +42,10 @@ class Parser:
     def program(self):
         print("PROGRAM")
 
+        # Skip excess newlines
+        while self.curToken(TokenType.NEWLINE):
+            self.nextToken()
+
         # Parse all statements in the program.
         while not self.checkToken(TokenType.EOF):
             self.statement()
@@ -60,6 +64,7 @@ class Parser:
                 else:
                     # Expect an expression
                     self.expression()
+
         # "IF" comparison "THEN" {statement} "ENDIF"
             case TokenType.IF:
                 print("STATEMENT-IF")
@@ -75,10 +80,49 @@ class Parser:
 
                 self.match(TokenType.ENDIF)
 
+        # "WHILE" comparison "REPEAT" nl {STATEMENT nl} "endwhile" nl
+            case TokenType.WHILE:
+                print("STATEMENT-WHILE")
+                self.nextToken()
+                self.comparison()
 
+                self.match(TokenType.REPEAT)
+                self.newline()
 
+                while not self.checkToken(TokenType.ENDWHILE):
+                    self.statement()
+
+                self.match(TokenType.ENDWHILE)
+
+        # "LABEL" ident
+            case TokenType.LABEL:
+                print("STATEMENT-LABEL")
+                self.nextToken()
+                self.match(TokenType.IDENT)
+
+        # "GOTO" ident
+            case TokenType.GOTO:
+                print("STATEMENT-GOTO")
+                self.nextToken()
+                self.match(TokenType.IDENT)
+
+        # "LET" ident "=" expression
+            case TokenType.LET:
+                print("STATEMENT-LET")
+                self.nextToken()
+                self.match(TokenType.IDENT)
+                self.match(TokenType.EQ)
+                self.expression()
+
+        # "INPUT" ident
+            case TokenType.INPUT:
+                print("STATEMENT-INPUT")
+                self.nextToken()
+                self.match(TokenType.IDENT)
 
             case _:
                 self.abort("Invalid statement at " + self.curToken.text + " (" + self.curToken.kind.name + ")")
         # end statement
+
+
         self.newline()
